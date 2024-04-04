@@ -1,9 +1,9 @@
 # PDF-viewer and Extractor Web Application
 
-**##Description**
+**Description**
 This web application allows users to upload files via a formand view them using PDFviewer component.Users can also extract pages and create new PDF files fromthe uploaded files. 
 
-**##Installation**
+**Installation**
 To install and run the PDF-viewer and Extractor Web Application, follow these steps:
 
 1.Clone the repository: **git clone https://github.com/JIJIN12/PDF-viewer**
@@ -12,7 +12,7 @@ To install and run the PDF-viewer and Extractor Web Application, follow these st
 4.Start the application: **npm run dev**
 5.Open your web browser and go to **'http://localhost:2000'**.
 
-**##Usage**
+**Usage**
 To use the PDF-viewer and Extractor Web Application:
 
 1.Navigate to the homepage.
