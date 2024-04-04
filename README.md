@@ -10,7 +10,7 @@ To install and run the PDF-viewer and Extractor Web Application, follow these st
 2.Navigate to the project directory: **cd client**.
 3.Install dependencies: **npm install**.
 4.Start the application: **npm run dev**.
-5.Open your web browser and go to **'http://localhost:2000'**.
+5.Open your web browser and go to **'http://localhost:5173/'**.
 
 **Usage**
 To use the PDF-viewer and Extractor Web Application:
