@@ -43,10 +43,17 @@ export default function Home() {
 
   const handleCheckboxChange = (e) => {
     const { name, value, checked } = e.target;
-    set_selectedpage((prevState) => ({
-      ...prevState,
-      [value]: checked,
-    }));
+    set_selectedpage((prevState) => {
+      const updatedPages = { ...prevState };
+      if (checked) {
+        // If checkbox is checked, add it to selected pages
+        updatedPages[value] = true;
+      } else {
+        // If checkbox is unchecked, remove it from selected pages
+        delete updatedPages[value];
+      }
+      return updatedPages;
+    });
   };
 
   const extractinput = () => {
