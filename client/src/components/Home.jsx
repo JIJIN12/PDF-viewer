@@ -24,6 +24,7 @@ export default function Home() {
   }, []);
 
   const viewpdf = (data) => {
+    set_selectedpage([])
     set_pdfdata(data.pdf);
   };
   const closePdfView = () => {
@@ -38,17 +39,14 @@ export default function Home() {
     setTotalPages(numPages.doc._pdfInfo.numPages);
   };
 
+ 
+
   const handleCheckboxChange = (e) => {
-    console.log(e.target.checked);
-    const { checked, value } = e.target;
-    const pageNumber = String(value);
-    if (checked) {
-      set_selectedpage((prevSelectedpage) => [...prevSelectedpage, pageNumber]);
-    } else {
-      set_selectedpage((prevSelectedpage) =>
-        prevSelectedpage.filter((page) => page !== pageNumber)
-      );
-    }
+    const { name, value, checked } = e.target;
+    set_selectedpage((prevState) => ({
+      ...prevState,
+      [value]: checked,
+    }));
   };
 
   const extractinput = () => {
