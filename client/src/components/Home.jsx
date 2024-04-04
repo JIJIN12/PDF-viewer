@@ -2,16 +2,25 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Viewer, SpecialZoomLevel } from "@react-pdf-viewer/core";
 import { Worker } from "@react-pdf-viewer/core";
-
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 export default function Home() {
   const [homedata, set_homedata] = useState([]);
   const [pdfdata, set_pdfdata] = useState(null);
   const [totalPages, setTotalPages] = useState(0);
   const [selectedpage, set_selectedpage] = useState([]);
   const [extractedpdf, set_extractedpdf] = useState([]);
+  const [error, setError] = useState(null);
 
   // console.log('totalPages:',totalPages);
   console.log("selectedpage:", selectedpage);
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setError(null);
+  };
   useEffect(() => {
     axios
       .get("http://localhost:2000/form/data")
@@ -62,11 +71,18 @@ export default function Home() {
         selectedpage: selectedpage,
         pdfdata: pdfdata,
       })
-      .then((Response) => {
-        console.log(Response.data);
-        set_extractedpdf(Response.data);
+      .then((response) => {
+        console.log(response.data);
+        set_extractedpdf(response.data);
+      })
+      .catch((error) => {
+        console.log("Error extracting PDF:", error);
+        setError(error.response?.data?.message || 'An unknown error occurred');
       });
   };
+  
+
+  
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -87,7 +103,7 @@ export default function Home() {
               <div className=" md:block">
                 <a
                   href="/form"
-                  className="text-white px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-white px-3 py-2 rounded-md text-sm font-medium hover:text-orange-600"
                 >
                   Add PDF
                 </a>
@@ -98,7 +114,18 @@ export default function Home() {
       </nav>
 
       {/* Page content */}
+      
       <main className="py-10">
+      <Snackbar
+      open={!!error}
+      autoHideDuration={6000}
+      onClose={handleClose}
+      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+    >
+      <MuiAlert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+        {error}
+      </MuiAlert>
+    </Snackbar>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div className="p-6 bg-white border-b border-gray-200">
@@ -111,7 +138,7 @@ export default function Home() {
                   >
                     <p>{data.pdf_name}</p>
                     <button
-                      className="bg-green-500 px-3 py-1 rounded-lg text-white"
+                      className="bg-green-500 px-3 py-1 rounded-lg text-white hover:text-zinc-600"
                       onClick={() => viewpdf(data)}
                     >
                       View PDF
