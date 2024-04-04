@@ -130,7 +130,7 @@ console.log('ll');
     });
   } catch (error) {
     console.error("Error processing PDF:", error);
-    res.status(500).json({ success: false, message: "Error processing PDF" });
+    res.status(400).json({ success: false, message: "Error processing PDF" });
   }
 });
 module.exports = formRouter;
