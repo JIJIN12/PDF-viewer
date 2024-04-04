@@ -95,6 +95,7 @@ export default function Home() {
             </button>
           ) : null}
           <div className="checkbox-container">
+            <p>select pages from below</p>
             {[...Array(totalPages).keys()].map((index) => (
               <div key={index} className="checkbox-item">
                 <label>
@@ -105,7 +106,7 @@ export default function Home() {
                     onChange={handleCheckboxChange}
                     checked={selectedpage.hasOwnProperty(String(index))}
                   />
-                </label>
+                </label>{index+1}
               </div>
             ))}
           </div>
