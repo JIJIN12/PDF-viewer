@@ -6,10 +6,10 @@ This web application allows users to upload files via a formand view them using 
 **Installation**
 To install and run the PDF-viewer and Extractor Web Application, follow these steps:
 
-1.Clone the repository: **git clone https://github.com/JIJIN12/PDF-viewer**
-2.Navigate to the project directory: **cd client**
-3.Install dependencies: **npm install**
-4.Start the application: **npm run dev**
+1.Clone the repository: **git clone https://github.com/JIJIN12/PDF-viewer**.
+2.Navigate to the project directory: **cd client**.
+3.Install dependencies: **npm install**.
+4.Start the application: **npm run dev**.
 5.Open your web browser and go to **'http://localhost:2000'**.
 
 **Usage**
