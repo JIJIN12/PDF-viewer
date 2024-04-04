@@ -3,7 +3,7 @@ const form_model = require("../model/fileformModel");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const { PDFDocument } = require("pdf-lib");
+const PDFExtract = require("pdf.js-extract").PDFExtract;
 const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
@@ -77,53 +77,56 @@ formRouter.get("/data", async function (req, res) {
 
 formRouter.post("/extract", async function (req, res) {
   try {
-    const selectedpage = req.body.selectedpage;
-    console.log("selectedpage", selectedpage);
-    const pdf = req.body.pdfdata;
-    console.log("pdf", pdf);
-    const pdfdata = await form_model.findOne({ pdf: pdf });
-    console.log(pdfdata);
-    console.log("11");
+    console.log(req.body);
+    const selectedPages = req.body.selectedpage;
+    console.log("Selected Pages:", selectedPages);
 
-    const response = await axios.get(pdf, { responseType: "arraybuffer" });
-    const pdfbyte = Buffer.from(response.data);
+    const pdfPath = req.body.pdfdata; // Assuming pdfdata contains the URL to the PDF file on Cloudinary
+console.log('ll');
+    // Extract the public ID from the Cloudinary URL
+    const publicIdStartIndex = pdfPath.lastIndexOf('/') + 1;
+    const publicIdEndIndex = pdfPath.lastIndexOf('.');
+    const publicId = pdfPath.substring(publicIdStartIndex, publicIdEndIndex);
+    
+    // Construct the local file path where the PDF will be saved temporarily
+    const tempFilePath = path.join(__dirname, `temp_${publicId}.pdf`);
+    const pdfExtract = new PDFExtract();
+    console.log('kk');
 
-    console.log(pdfbyte);
-    console.log("11");
-    const pdfDoc = await PDFDocument.load(pdfbyte);
-    console.log("Loaded PDF Document:", pdfDoc);
-    const newPdfDoc = await PDFDocument.create();
+    // Extract the selected pages from the PDF using pdf.js-extract
+    pdfExtract.extract(pdfPath, {}, async (err, data) => {
+      if (err) {
+        console.error("Error extracting PDF:", err);
+        return res
+          .status(500)
+          .json({ success: false, message: "Error extracting PDF" });
+      }
 
-    selectedpage.forEach((element) => {});
-    (element) => {};
-    (pageIndex) => {
-      const pageIndexInt = parseInt(pageIndex, 10); // Convert page index to zero-based
-      const [copiedPage] = newPdfDoc.copyPages(pdfDoc, [pageIndexInt]);
-      newPdfDoc.addPage(copiedPage);
-    };
-    const newPdfBytes = await newPdfDoc.save();
-    const newPdfBase64 = Buffer.from(newPdfBytes).toString("base64");
+      // Create a new PDF document to copy selected pages into
+      const newPdfDoc = await PDFDocument.create();
+      console.log("ll");
+      // Iterate over the selected pages and copy them to the new PDF document
+      selectedPages.forEach((pageIndex) => {
+        const pageIndexInt = parseInt(pageIndex, 10) - 1; // Convert page index to zero-based
+        const pageContent = data.pages[pageIndexInt].content; // Get the content of the selected page
+        // Add the page content to the new PDF document (you may need to adjust this based on the content structure)
+        newPdfDoc.addPage([pageContent]);
+      });
 
-    // const newPdfBase64 = newPdfBytes.toString("base64");
-    // const outputPath = path.join(__dirname, "output.pdf");
-    // fs.writeFileSync(outputPath, newPdfBytes);
-    const dataUri = `data:application/pdf;base64,${newPdfBase64}`;
+      // Serialize the new PDF document to bytes
+      const newPdfBytes = await newPdfDoc.save();
 
-    const updatedFormModel = await form_model.findOneAndUpdate(
-      { pdf: pdf }, // Corrected to use pdfUrl
-      { 
-          extracted_pdf: dataUri // Save the Cloudinary URL of the extracted PDF
-      },
-      { new: true }
-  );
-   
-   
+      // Define the file path where the new PDF will be saved
+      const outputPath = path.join(__dirname, "output.pdf");
 
-    // Delete the temporary file
-    res.status(200).json({
-      success: true,
-      message: "data collected successfully",
-      details: dataUri,
+      // Write the new PDF bytes to the file
+      fs.writeFileSync(outputPath, newPdfBytes);
+
+      res.status(200).json({
+        success: true,
+        message: "Selected pages copied successfully and new PDF saved to file",
+        filePath: outputPath, // Include the file path in the response
+      });
     });
   } catch (error) {
     console.error("Error processing PDF:", error);
